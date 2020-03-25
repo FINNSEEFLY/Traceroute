@@ -6,8 +6,7 @@ using System.Threading;
 using System.Diagnostics;
 
 namespace traceroute
-{
-
+{ 
     class Program
     {
         const int TYPE_REQUEST_ECHO = 8;
@@ -20,6 +19,15 @@ namespace traceroute
         static int NUM_IN_ARGS_OF_ADDR;
         static int LAST_NUM_OF_REQUESTS;
         const string KEY_SHOW_NAMES = "-a";
+        static int CalculatePing(DateTime beginmoment, DateTime endmoment)
+        {
+            var result = endmoment.Millisecond - beginmoment.Millisecond;
+            if (result<0)
+            {
+                result = 1000 - Math.Abs(result);
+            }
+            return result;
+        }
         static void Main(string[] args)
         {
             LAST_NUM_OF_REQUESTS = MAX_NUM_OF_REQUESTS - 1;
@@ -113,13 +121,13 @@ namespace traceroute
                         ICMP responsePacket = new ICMP(responseBytes, responseSize);
                         if ((responsePacket.PacketType == TYPE_REQUEST_ECHO_REPLY) || (responsePacket.PacketType == TYPE_REQUEST_TIME_TO_LIVE_EXCEEDED))
                         {
-                             if (Math.Max(endMoment.Millisecond, beginMoment.Millisecond) - Math.Min(endMoment.Millisecond, beginMoment.Millisecond) == 0)
+                             if (CalculatePing(beginMoment,endMoment) == 0)
                              {
                                  Console.Write("<1 мс\t");
                              }
                              else
                              {
-                                Console.Write("{0} мс\t", Math.Max(endMoment.Millisecond, beginMoment.Millisecond) - Math.Min(endMoment.Millisecond, beginMoment.Millisecond));
+                                Console.Write("{0} мс\t", CalculatePing(beginMoment, endMoment));
                              }
                             if (numOFRequest == LAST_NUM_OF_REQUESTS)
                             {
